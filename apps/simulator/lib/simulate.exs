@@ -73,7 +73,7 @@ end
 
 # We have to have a channel to communicate to RabbitMQ
 {:ok, channel} = Channel.open(conn)
-# Turn of publish confirms
+# Turn on publish confirms
 :ok = Confirm.select(channel)
 
 # We are running on a single thread anyway, so lets prefetch 5 messages
@@ -84,6 +84,7 @@ do_log.("Opened channel on connection=#{opts[:host]}:#{opts[:port]}")
 # Declaring our own, single queue
 {:ok, _} = Queue.declare(channel, queue_name, durable: true)
 
+# create bindings for the exchanges->queues
 for exchange <- [commands_exchange, shovel_incoming_exchange] do
   Queue.bind(channel, queue_name, exchange, routing_key: "command." <> instance_name)
 end
