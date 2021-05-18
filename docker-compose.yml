@@ -1,11 +1,3 @@
-x-volumes: &volumes
-  volumes:
-    - ./config/erlang-cookie:/root/.erlang.cookie
-    - ./config/erlang-cookie:/var/lib/rabbitmq/.erlang.cookie
-    - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-    - ./config/enabled_plugins:/etc/rabbitmq/enabled_plugins
-    - ./config/advanced.config:/etc/rabbitmq/advanced.config
-    - ./config/management_agent.disable_metrics_collector.conf:/etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf
 version: '3'
 services:
   rmq_im:
@@ -16,7 +8,14 @@ services:
       - 5672:5672
       - 5673:5673
       - 15672:15672
-    <<: *volumes
+    volumes: 
+      - ./config/erlang-cookie:/root/.erlang.cookie
+      - ./config/erlang-cookie:/var/lib/rabbitmq/.erlang.cookie
+      - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./config/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./config/advanced.config:/etc/rabbitmq/advanced.config
+      - ./config/management_agent.disable_metrics_collector.conf:/etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf
+      - ./config/rabbit_im-rmq.local.json:/definitions.json
     environment:
       - RABBITMQ_USE_LONGNAME=true
       - RABBITMQ_NODENAME=rabbit@im-rmq.local
@@ -33,7 +32,14 @@ services:
       - 5682:5672
       - 5683:5673
       - 15682:15672
-    <<: *volumes
+    volumes: 
+      - ./config/erlang-cookie:/root/.erlang.cookie
+      - ./config/erlang-cookie:/var/lib/rabbitmq/.erlang.cookie
+      - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./config/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./config/advanced.config:/etc/rabbitmq/advanced.config
+      - ./config/management_agent.disable_metrics_collector.conf:/etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf
+      - ./config/rabbit_ic-rmq.local.json:/definitions.json
     environment:
       - RABBITMQ_NODENAME=rabbit@ic-rmq.local
       - RABBITMQ_USE_LONGNAME=true

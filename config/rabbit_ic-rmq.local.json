@@ -1,0 +1,171 @@
+{
+  "rabbit_version": "3.8.16",
+  "rabbitmq_version": "3.8.16",
+  "product_name": "RabbitMQ",
+  "product_version": "3.8.16",
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "7eRFlHfbpiw0eltdk8/mBwwfrMsb0uvCZwOBYPEfQEhT0Emd",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator",
+      "limits": {}
+    }
+  ],
+  "vhosts": [{ "name": "/" }],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "parameters": [],
+  "global_parameters": [
+    { "name": "cluster_name", "value": "rabbit@ic-rmq.local" },
+    {
+      "name": "internal_cluster_id",
+      "value": "rabbitmq-cluster-id-DKDloH0pOKNaax6j1nLb-Q"
+    }
+  ],
+  "policies": [],
+  "queues": [
+    {
+      "name": "ic-to-im-shovel-queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "Queue for csm-1",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "commands",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "events",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "shovel-incoming",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "replies",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "commands",
+      "vhost": "/",
+      "destination": "ic-to-im-shovel-queue",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    },
+    {
+      "source": "commands",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "command.csm-1",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "ic-to-im-shovel-queue",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "event.#",
+      "arguments": {}
+    },
+    {
+      "source": "replies",
+      "vhost": "/",
+      "destination": "ic-to-im-shovel-queue",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    },
+    {
+      "source": "replies",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "reply_to.csm-1",
+      "arguments": {}
+    },
+    {
+      "source": "shovel-incoming",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "command.csm-1",
+      "arguments": {}
+    },
+    {
+      "source": "shovel-incoming",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "event.#",
+      "arguments": {}
+    },
+    {
+      "source": "shovel-incoming",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "event.started.csm-2",
+      "arguments": {}
+    },
+    {
+      "source": "shovel-incoming",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "reply_to.csm-1",
+      "arguments": {}
+    }
+  ]
+}

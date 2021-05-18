@@ -1,0 +1,231 @@
+{
+  "rabbit_version": "3.8.16",
+  "rabbitmq_version": "3.8.16",
+  "product_name": "RabbitMQ",
+  "product_version": "3.8.16",
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "bbY18JOfRvQjbyPOdRoJbiTcBiE4Upeo7/2tkm1xLv5yibXh",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator",
+      "limits": {}
+    }
+  ],
+  "vhosts": [{ "name": "/" }],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "parameters": [
+    {
+      "value": {
+        "ack-mode": "on-confirm",
+        "dest-add-forward-headers": true,
+        "dest-exchange": "shovel-incoming",
+        "dest-protocol": "amqp091",
+        "dest-uri": "amqp://ic-rmq.local",
+        "reconnect-delay": 5,
+        "src-delete-after": "never",
+        "src-protocol": "amqp091",
+        "src-queue": "im-to-ic-shovel-queue",
+        "src-uri": "amqp://"
+      },
+      "vhost": "/",
+      "component": "shovel",
+      "name": "im-to-ic-shovel"
+    },
+    {
+      "value": {
+        "ack-mode": "on-confirm",
+        "dest-add-forward-headers": true,
+        "dest-exchange": "shovel-incoming",
+        "dest-protocol": "amqp091",
+        "dest-uri": "amqp://",
+        "reconnect-delay": 5,
+        "src-delete-after": "never",
+        "src-protocol": "amqp091",
+        "src-queue": "ic-to-im-shovel-queue",
+        "src-uri": "amqp://ic-rmq.local"
+      },
+      "vhost": "/",
+      "component": "shovel",
+      "name": "ic-to-im-shovel"
+    }
+  ],
+  "global_parameters": [
+    { "name": "cluster_name", "value": "rabbit@im-rmq.local" },
+    {
+      "name": "internal_cluster_id",
+      "value": "rabbitmq-cluster-id-cOC-e69sHBmXG5LgrC9cdQ"
+    }
+  ],
+  "policies": [
+    {
+      "vhost": "/",
+      "name": "expire",
+      "pattern": ".*",
+      "apply-to": "queues",
+      "definition": { "message-ttl": 60000 },
+      "priority": 1
+    }
+  ],
+  "queues": [
+    {
+      "name": "Queue for unit-1",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "im-to-ic-shovel-queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": { "x-queue-type": "classic" }
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "commands",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "events",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "shovel-incoming",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "replies",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "commands",
+      "vhost": "/",
+      "destination": "im-to-ic-shovel-queue",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    },
+    {
+      "source": "commands",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "command.unit-1",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "im-to-ic-shovel-queue",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "event.#",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "event.started.csm.*",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "event.started.csm.1",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "event.started.csm.2",
+      "arguments": {}
+    },
+    {
+      "source": "replies",
+      "vhost": "/",
+      "destination": "im-to-ic-shovel-queue",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    },
+    {
+      "source": "replies",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "reply_to.unit-1",
+      "arguments": {}
+    },
+    {
+      "source": "shovel-incoming",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "command.unit-1",
+      "arguments": {}
+    },
+    {
+      "source": "shovel-incoming",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "event.#",
+      "arguments": {}
+    },
+    {
+      "source": "shovel-incoming",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "reply_to.unit-1",
+      "arguments": {}
+    }
+  ]
+}
