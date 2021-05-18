@@ -1,0 +1,63 @@
+x-volumes: &volumes
+  volumes:
+    - ./config/erlang-cookie:/root/.erlang.cookie
+    - ./config/erlang-cookie:/var/lib/rabbitmq/.erlang.cookie
+    - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    - ./config/enabled_plugins:/etc/rabbitmq/enabled_plugins
+    - ./config/advanced.config:/etc/rabbitmq/advanced.config
+    - ./config/management_agent.disable_metrics_collector.conf:/etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf
+version: '3'
+services:
+  rmq_im:
+    image: rabbitmq:3.8.16
+    hostname: im-rmq.local
+    container_name: im-rmq.local
+    ports:
+      - 5672:5672
+      - 5673:5673
+      - 15672:15672
+    <<: *volumes
+    environment:
+      - RABBITMQ_USE_LONGNAME=true
+      - RABBITMQ_NODENAME=rabbit@im-rmq.local
+    cap_add: # only for debugging
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_PTRACE
+
+  rmq_ic:
+    image: rabbitmq:3.8.16
+    hostname: ic-rmq.local
+    container_name: ic-rmq.local
+    ports:
+      - 5682:5672
+      - 5683:5673
+      - 15682:15672
+    <<: *volumes
+    environment:
+      - RABBITMQ_NODENAME=rabbit@ic-rmq.local
+      - RABBITMQ_USE_LONGNAME=true
+    cap_add: # only for debugging
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_PTRACE
+
+  unit: 
+    image: elixir:1.11.4
+    volumes: 
+      - ./apps:/apps
+    working_dir: /app
+    command: bash -c "/apps/start.sh"
+    environment: 
+      - RABBITMQ_HOST=im-rmq.local
+      - INSTANCE_NAME=unit-1
+
+  csm: 
+    image: elixir:1.11.4
+    volumes: 
+      - ./apps:/apps
+    working_dir: /app
+    command: bash -c "/apps/start.sh"
+    environment: 
+      - RABBITMQ_HOST=ic-rmq.local
+      - INSTANCE_NAME=csm-1
