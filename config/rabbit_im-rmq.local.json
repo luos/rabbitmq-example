@@ -35,7 +35,8 @@
         "src-delete-after": "never",
         "src-protocol": "amqp091",
         "src-queue": "im-to-ic-shovel-queue",
-        "src-uri": "amqp://"
+        "src-uri": "amqp://",
+        "src-prefetch-count": 10
       },
       "vhost": "/",
       "component": "shovel",
@@ -52,7 +53,8 @@
         "src-delete-after": "never",
         "src-protocol": "amqp091",
         "src-queue": "ic-to-im-shovel-queue",
-        "src-uri": "amqp://ic-rmq.local"
+        "src-uri": "amqp://ic-rmq.local",
+        "src-prefetch-count": 10
       },
       "vhost": "/",
       "component": "shovel",
