@@ -1,0 +1,312 @@
+{
+  "rabbit_version": "3.8.16",
+  "rabbitmq_version": "3.8.16",
+  "product_name": "RabbitMQ",
+  "product_version": "3.8.16",
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "7eRFlHfbpiw0eltdk8/mBwwfrMsb0uvCZwOBYPEfQEhT0Emd",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator",
+      "limits": {}
+    }
+  ],
+  "vhosts": [{ "name": "/" }],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "parameters": [
+    {
+      "value": {
+        "ack-mode": "on-confirm",
+        "max-hops": 1,
+        "prefetch-count": 5,
+        "reconnect-delay": 5,
+        "trust-user-id": false,
+        "uri": "amqp://im-rmq.federated.local",
+        "resource-cleanup-mode": "never"
+      },
+      "vhost": "/",
+      "component": "federation-upstream",
+      "name": "From-Instrument-Management-Federation"
+    }
+  ],
+  "global_parameters": [
+    { "name": "cluster_name", "value": "rabbit@ic-rmq.federated.local" },
+    {
+      "name": "internal_cluster_id",
+      "value": "rabbitmq-cluster-id-DKDloH0pOKNaax6j1nLb-Q"
+    }
+  ],
+  "policies": [
+    {
+      "vhost": "/",
+      "name": "From-IM-Federation",
+      "pattern": "^events$|^commands$|^replies$",
+      "apply-to": "exchanges",
+      "definition": { "federation-upstream-set": "all" },
+      "priority": 5
+    }
+  ],
+  "queues": [
+    {
+      "name": "Queue for csm-1",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "federation: replies -> rabbit@im-rmq.federated.local",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": { "x-internal-purpose": "federation" }
+    },
+    {
+      "name": "federation: commands -> rabbit@im-rmq.federated.local",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": { "x-internal-purpose": "federation" }
+    },
+    {
+      "name": "federation: events -> rabbit@im-rmq.federated.local",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": { "x-internal-purpose": "federation" }
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "federation: replies -> rabbit@im-rmq.federated.local A",
+      "vhost": "/",
+      "type": "x-federation-upstream",
+      "durable": true,
+      "auto_delete": true,
+      "internal": true,
+      "arguments": {
+        "x-downstream-name": "rabbit@im-rmq.federated.local",
+        "x-downstream-vhost": "/",
+        "x-internal-purpose": "federation",
+        "x-max-hops": 1
+      }
+    },
+    {
+      "name": "commands",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "events",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "federation: events -> rabbit@im-rmq.federated.local A",
+      "vhost": "/",
+      "type": "x-federation-upstream",
+      "durable": true,
+      "auto_delete": true,
+      "internal": true,
+      "arguments": {
+        "x-downstream-name": "rabbit@im-rmq.federated.local",
+        "x-downstream-vhost": "/",
+        "x-internal-purpose": "federation",
+        "x-max-hops": 1
+      }
+    },
+    {
+      "name": "replies",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "federation: commands -> rabbit@im-rmq.federated.local A",
+      "vhost": "/",
+      "type": "x-federation-upstream",
+      "durable": true,
+      "auto_delete": true,
+      "internal": true,
+      "arguments": {
+        "x-downstream-name": "rabbit@im-rmq.federated.local",
+        "x-downstream-vhost": "/",
+        "x-internal-purpose": "federation",
+        "x-max-hops": 1
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "commands",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "command.csm-1",
+      "arguments": {}
+    },
+    {
+      "source": "commands",
+      "vhost": "/",
+      "destination": "federation: commands -> rabbit@im-rmq.federated.local A",
+      "destination_type": "exchange",
+      "routing_key": "command.unit-1",
+      "arguments": {
+        "x-bound-from": [
+          {
+            "cluster-name": "rabbit@im-rmq.federated.local",
+            "exchange": "/:commands A",
+            "hops": 1,
+            "vhost": "/"
+          }
+        ]
+      }
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "federation: events -> rabbit@im-rmq.federated.local A",
+      "destination_type": "exchange",
+      "routing_key": "event.#",
+      "arguments": {
+        "x-bound-from": [
+          {
+            "cluster-name": "rabbit@im-rmq.federated.local",
+            "exchange": "/:events A",
+            "hops": 1,
+            "vhost": "/"
+          }
+        ]
+      }
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "event.#",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "federation: events -> rabbit@im-rmq.federated.local A",
+      "destination_type": "exchange",
+      "routing_key": "event.started.csm.*",
+      "arguments": {
+        "x-bound-from": [
+          {
+            "cluster-name": "rabbit@im-rmq.federated.local",
+            "exchange": "/:events A",
+            "hops": 1,
+            "vhost": "/"
+          }
+        ]
+      }
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "federation: events -> rabbit@im-rmq.federated.local A",
+      "destination_type": "exchange",
+      "routing_key": "event.started.csm.1",
+      "arguments": {
+        "x-bound-from": [
+          {
+            "cluster-name": "rabbit@im-rmq.federated.local",
+            "exchange": "/:events A",
+            "hops": 1,
+            "vhost": "/"
+          }
+        ]
+      }
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "federation: events -> rabbit@im-rmq.federated.local A",
+      "destination_type": "exchange",
+      "routing_key": "event.started.csm.2",
+      "arguments": {
+        "x-bound-from": [
+          {
+            "cluster-name": "rabbit@im-rmq.federated.local",
+            "exchange": "/:events A",
+            "hops": 1,
+            "vhost": "/"
+          }
+        ]
+      }
+    },
+    {
+      "source": "federation: commands -> rabbit@im-rmq.federated.local A",
+      "vhost": "/",
+      "destination": "federation: commands -> rabbit@im-rmq.federated.local",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "federation: events -> rabbit@im-rmq.federated.local A",
+      "vhost": "/",
+      "destination": "federation: events -> rabbit@im-rmq.federated.local",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "federation: replies -> rabbit@im-rmq.federated.local A",
+      "vhost": "/",
+      "destination": "federation: replies -> rabbit@im-rmq.federated.local",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "replies",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "reply_to.csm-1",
+      "arguments": {}
+    },
+    {
+      "source": "replies",
+      "vhost": "/",
+      "destination": "federation: replies -> rabbit@im-rmq.federated.local A",
+      "destination_type": "exchange",
+      "routing_key": "reply_to.unit-1",
+      "arguments": {
+        "x-bound-from": [
+          {
+            "cluster-name": "rabbit@im-rmq.federated.local",
+            "exchange": "/:replies A",
+            "hops": 1,
+            "vhost": "/"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "rabbit_version": "3.8.16",
+  "rabbitmq_version": "3.8.16",
+  "product_name": "RabbitMQ",
+  "product_version": "3.8.16",
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "bbY18JOfRvQjbyPOdRoJbiTcBiE4Upeo7/2tkm1xLv5yibXh",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator",
+      "limits": {}
+    }
+  ],
+  "vhosts": [{ "name": "/" }],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "parameters": [
+    {
+      "value": {
+        "ack-mode": "on-confirm",
+        "max-hops": 1,
+        "prefetch-count": 5,
+        "reconnect-delay": 5,
+        "trust-user-id": false,
+        "uri": "amqp://ic-rmq.federated.local",
+        "resource-cleanup-mode": "never"
+      },
+      "vhost": "/",
+      "component": "federation-upstream",
+      "name": "From-Instrument-Control-Federation"
+    }
+  ],
+  "global_parameters": [
+    { "name": "cluster_name", "value": "rabbit@im-rmq.federated.local" },
+    {
+      "name": "internal_cluster_id",
+      "value": "rabbitmq-cluster-id-cOC-e69sHBmXG5LgrC9cdQ"
+    }
+  ],
+  "policies": [
+    {
+      "vhost": "/",
+      "name": "From-IC-Federation",
+      "pattern": "^events$|^commands$|^replies$",
+      "apply-to": "exchanges",
+      "definition": { "federation-upstream-set": "all" },
+      "priority": 5
+    },
+    {
+      "vhost": "/",
+      "name": "expire",
+      "pattern": ".*",
+      "apply-to": "queues",
+      "definition": { "message-ttl": 60000 },
+      "priority": 1
+    }
+  ],
+  "queues": [
+    {
+      "name": "Queue for unit-1",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "commands",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "events",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "replies",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "commands",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "command.unit-1",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "event.#",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "event.started.csm.*",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "event.started.csm.1",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "event.started.csm.2",
+      "arguments": {}
+    },
+    {
+      "source": "replies",
+      "vhost": "/",
+      "destination": "Queue for unit-1",
+      "destination_type": "queue",
+      "routing_key": "reply_to.unit-1",
+      "arguments": {}
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+version: '3'
+services:
+  rmq_feder_im:
+    image: rabbitmq:3.8.16
+    hostname: im-rmq.federated.local
+    container_name: im-rmq.federated.local
+    ports:
+      - 5672:5672
+      - 5673:5673
+      - 15672:15672
+    volumes: 
+      - ./config/erlang-cookie:/root/.erlang.cookie
+      - ./config/erlang-cookie:/var/lib/rabbitmq/.erlang.cookie
+      - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./config/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./config/advanced.config:/etc/rabbitmq/advanced.config
+      - ./config/management_agent.disable_metrics_collector.conf:/etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf
+      - ./config/rabbit_im-rmq.local.json:/definitions.json
+    environment:
+      - RABBITMQ_USE_LONGNAME=true
+      - RABBITMQ_NODENAME=rabbit@im-rmq.federated.local
+    cap_add: # only for debugging
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_PTRACE
+
+  rmq_feder_ic:
+    image: rabbitmq:3.8.16
+    hostname: ic-rmq.federated.local
+    container_name: ic-rmq.federated.local
+    ports:
+      - 5682:5672
+      - 5683:5673
+      - 15682:15672
+    volumes: 
+      - ./config/erlang-cookie:/root/.erlang.cookie
+      - ./config/erlang-cookie:/var/lib/rabbitmq/.erlang.cookie
+      - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./config/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./config/advanced.config:/etc/rabbitmq/advanced.config
+      - ./config/management_agent.disable_metrics_collector.conf:/etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf
+      - ./config/rabbit_ic-rmq.local.json:/definitions.json
+    environment:
+      - RABBITMQ_NODENAME=rabbit@ic-rmq.federated.local
+      - RABBITMQ_USE_LONGNAME=true
+    cap_add: # only for debugging
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_PTRACE
+
+  unit: 
+    image: elixir:1.11.4
+    volumes: 
+      - ./apps:/apps
+    working_dir: /app
+    command: bash -c "/apps/start.sh"
+    environment: 
+      - RABBITMQ_HOST=im-rmq.federated.local
+      - INSTANCE_NAME=unit-1
+
+  csm: 
+    image: elixir:1.11.4
+    volumes: 
+      - ./apps:/apps
+    working_dir: /app
+    command: bash -c "/apps/start.sh"
+    environment: 
+      - RABBITMQ_HOST=ic-rmq.federated.local
+      - INSTANCE_NAME=csm-1
