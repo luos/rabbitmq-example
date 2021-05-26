@@ -8,5 +8,6 @@ RUN export FLAGS=""; export MAKEFLAGS='-j6';  cd otp && ./otp_build autoconf && 
 RUN apt install -y wget logrotate socat procps vim
 RUN wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.16/rabbitmq-server_3.8.16-1_all.deb
 RUN dpkg --force-all -i rabbitmq-server_3.8.16-1_all.deb
+#  https://tipstricks.itmatrix.eu/force-aptitudeapt-get-ingoring-broken-dependencies/ 
 ENTRYPOINT [ "bash", "-c" ]
 CMD ["rabbitmq-server"]
