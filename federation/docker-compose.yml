@@ -64,6 +64,9 @@ services:
       - ./apps:/apps
     working_dir: /app
     command: bash -c "/apps/start.sh"
+    networks: 
+      - shovel_default
+      - other_network
     environment: 
       - RABBITMQ_HOST=ic-rmq.federated.local
       - INSTANCE_NAME=csm-1

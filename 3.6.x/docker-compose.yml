@@ -1,9 +1,9 @@
 version: '3'
 services:
-  rmq_im:
-    image: rabbit-32
-    hostname: im-rmq.local
-    container_name: im-rmq.local
+  rmq_feder_im:
+    image: lajosgerecsesl/rabitmq:3.6.6
+    hostname: im-rmq.36x.local
+    container_name: im-rmq.36x.local
     ports:
       - 5672:5672
       - 5673:5673
@@ -11,23 +11,21 @@ services:
     volumes: 
       - ./config/erlang-cookie:/root/.erlang.cookie
       - ./config/erlang-cookie:/var/lib/rabbitmq/.erlang.cookie
-      - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./config/rabbitmq.config:/etc/rabbitmq/rabbitmq.config
       - ./config/enabled_plugins:/etc/rabbitmq/enabled_plugins
-      - ./config/advanced.config:/etc/rabbitmq/advanced.config
-      - ./config/management_agent.disable_metrics_collector.conf:/etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf
       - ./config/rabbit_im-rmq.local.json:/definitions.json
     environment:
       - RABBITMQ_USE_LONGNAME=true
-      - RABBITMQ_NODENAME=rabbit@im-rmq.local
+      - RABBITMQ_NODENAME=rabbit@im-rmq.36x.local
     cap_add: # only for debugging
       - NET_ADMIN
       - NET_RAW
       - SYS_PTRACE
 
-  rmq_ic:
-    image: rabbitmq:3.8.16
-    hostname: ic-rmq.local
-    container_name: ic-rmq.local
+  rmq_feder_ic:
+    image: lajosgerecsesl/rabitmq:3.6.6
+    hostname: ic-rmq.36x.local
+    container_name: ic-rmq.36x.local
     ports:
       - 5682:5672
       - 5683:5673
@@ -35,13 +33,11 @@ services:
     volumes: 
       - ./config/erlang-cookie:/root/.erlang.cookie
       - ./config/erlang-cookie:/var/lib/rabbitmq/.erlang.cookie
-      - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
       - ./config/enabled_plugins:/etc/rabbitmq/enabled_plugins
-      - ./config/advanced.config:/etc/rabbitmq/advanced.config
-      - ./config/management_agent.disable_metrics_collector.conf:/etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf
+      - ./config/rabbitmq.config:/etc/rabbitmq/rabbitmq.config
       - ./config/rabbit_ic-rmq.local.json:/definitions.json
     environment:
-      - RABBITMQ_NODENAME=rabbit@ic-rmq.local
+      - RABBITMQ_NODENAME=rabbit@ic-rmq.36x.local
       - RABBITMQ_USE_LONGNAME=true
     cap_add: # only for debugging
       - NET_ADMIN
@@ -55,7 +51,7 @@ services:
     working_dir: /app
     command: bash -c "/apps/start.sh"
     environment: 
-      - RABBITMQ_HOST=im-rmq.local
+      - RABBITMQ_HOST=im-rmq.36x.local
       - INSTANCE_NAME=unit-1
 
   csm: 
@@ -65,5 +61,5 @@ services:
     working_dir: /app
     command: bash -c "/apps/start.sh"
     environment: 
-      - RABBITMQ_HOST=ic-rmq.local
+      - RABBITMQ_HOST=ic-rmq.36x.local
       - INSTANCE_NAME=csm-1

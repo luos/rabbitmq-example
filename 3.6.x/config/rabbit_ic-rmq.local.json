@@ -1,0 +1,122 @@
+{
+  "rabbit_version": "3.8.16",
+  "rabbitmq_version": "3.8.16",
+  "product_name": "RabbitMQ",
+  "product_version": "3.8.16",
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "7eRFlHfbpiw0eltdk8/mBwwfrMsb0uvCZwOBYPEfQEhT0Emd",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator",
+      "limits": {}
+    }
+  ],
+  "vhosts": [{ "name": "/" }],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "parameters": [
+    {
+      "value": {
+        "ack-mode": "on-confirm",
+        "max-hops": 1,
+        "prefetch-count": 5,
+        "reconnect-delay": 5,
+        "trust-user-id": false,
+        "uri": "amqp://im-rmq.36x.local"
+      },
+      "vhost": "/",
+      "component": "federation-upstream",
+      "name": "From-Instrument-Management-Federation"
+    }
+  ],
+  "global_parameters": [
+    { "name": "cluster_name", "value": "rabbit@ic-rmq.36x.local" },
+    {
+      "name": "internal_cluster_id",
+      "value": "rabbitmq-cluster-id-DKDloH0pOKNaax6j1nLb-Q"
+    }
+  ],
+  "policies": [
+    {
+      "vhost": "/",
+      "name": "From-IM-Federation",
+      "pattern": "^events$|^commands$|^replies$",
+      "apply-to": "exchanges",
+      "definition": { "federation-upstream-set": "all" },
+      "priority": 5
+    }
+  ],
+  "queues": [
+    {
+      "name": "Queue for csm-1",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "commands",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "events",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "replies",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "commands",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "command.csm-1",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "event.#",
+      "arguments": {}
+    },
+    {
+      "source": "replies",
+      "vhost": "/",
+      "destination": "Queue for csm-1",
+      "destination_type": "queue",
+      "routing_key": "reply_to.csm-1",
+      "arguments": {}
+    }
+  ]
+}
